@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Converter Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Moul&family=Moulpali&family=Kantumruy+Pro:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/337/337946.png">
+    <style>
+        /* Base Styles */
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4cc9f0;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4bb543;
+            --warning-color: #fca311;
+            --font-normal: 'Kantumruy Pro', sans-serif;
+            --font-header: 'Moul', 'Kantumruy Pro', sans-serif;
+            --font-modal: 'Moulpali', 'Kantumruy Pro', sans-serif;
+        }
+
+        @font-face {
+            font-family: 'Moul';
+            src: url('https://cdn.jsdelivr.net/gh/googlefonts/khmer@master/fonts/Moul/Moul-Regular.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Moulpali';
+            src: url('https://cdn.jsdelivr.net/gh/googlefonts/khmer@master/fonts/MoulPali/MoulPali-Regular.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-normal);
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: #f5f7ff;
+            overflow-x: hidden;
+        }
+
+        .khmer {
+            font-family: var(--font-normal);
+        }
+
+        /* Language Toggle */
+        .language-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            background: white;
+            border-radius: 30px;
+            padding: 5px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .language-toggle:hover {
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .language-toggle label {
+            cursor: pointer;
+            padding: 5px 15px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .language-toggle input[type="checkbox"] {
+            display: none;
+        }
+
+        .language-toggle input[type="checkbox"]:checked + .toggle-wrapper .en-label {
+            background: var(--primary-color);
+            color: white;
+            border-radius: 15px;
+        }
+
+        .language-toggle input[type="checkbox"]:not(:checked) + .toggle-wrapper .km-label {
+            background: var(--primary-color);
+            color: white;
+            border-radius: 15px;
+        }
+
+        .toggle-wrapper {
+            display: flex;
+            position: relative;
+        }
+
+        /* Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .back-to-top.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            background: var(--secondary-color);
+            transform: translateY(-3px);
+        }
+
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: white;
+        }
+
+        .logo img {
+            height: 40px;
+            width: auto;
+        }
+
+        .logo-text {
+            font-family: var(--font-header);
+            font-size: 1.5rem;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 1.5rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        nav a:hover {
+            color: var(--accent-color);
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-color);
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 8rem 2rem 4rem;
+            background: linear-gradient(135deg, #f5f7ff 0%, #e8ecff 100%);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-family: var(--font-header);
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--dark-color);
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin-bottom: 2.5rem;
+            color: #555;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.8rem;
+            border-radius: 30px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .hero-image {
+            max-width: 800px;
+            width: 100%;
+            margin-top: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            transform: translateY(20px);
+            opacity: 0;
+            animation: fadeInUp 1s ease forwards 0.3s;
+        }
+
+        .hero-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.05;
+            z-index: 1;
+            background-image: url('https://www.transparenttextures.com/patterns/cubes.png');
+        }
+
+        /* Features Section */
+        .features {
+            padding: 5rem 2rem;
+            background: white;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-title h2 {
+            font-family: var(--font-header);
+            font-size: 2.5rem;
+            color: var(--dark-color);
+            margin-bottom: 1rem;
+        }
+
+        .section-title p {
+            color: #666;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            transform: translateY(20px);
+            opacity: 0;
+        }
+
+        .feature-card.animated {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+        }
+
+        .feature-card p {
+            color: #666;
+        }
+
+        /* How It Works Section */
+        .how-it-works {
+            padding: 5rem 2rem;
+            background: linear-gradient(135deg, #f5f7ff 0%, #e8ecff 100%);
+        }
+
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .step {
+            display: flex;
+            gap: 1.5rem;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            transform: translateX(-20px);
+            opacity: 0;
+        }
+
+        .step.animated {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .step:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .step-number {
+            font-family: var(--font-header);
+            font-size: 2rem;
+            color: var(--primary-color);
+            min-width: 50px;
+            height: 50px;
+            background: rgba(67, 97, 238, 0.1);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .step-content h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: var(--dark-color);
+        }
+
+        .step-content p {
+            color: #666;
+        }
+
+        /* Testimonials Section */
+        .testimonials {
+            padding: 5rem 2rem;
+            background: white;
+        }
+
+        .testimonials-slider {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .testimonial-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: scale(0.9);
+        }
+
+        .testimonial-card.animated {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .testimonial-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 1rem;
+            border: 3px solid var(--primary-color);
+        }
+
+        .testimonial-quote {
+            font-size: 1.1rem;
+            font-style: italic;
+            color: #555;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .testimonial-quote::before,
+        .testimonial-quote::after {
+            content: '"';
+            font-size: 2rem;
+            color: var(--primary-color);
+            opacity: 0.3;
+            position: absolute;
+        }
+
+        .testimonial-quote::before {
+            top: -15px;
+            left: -10px;
+        }
+
+        .testimonial-quote::after {
+            bottom: -25px;
+            right: -10px;
+        }
+
+        .testimonial-author {
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 0.3rem;
+        }
+
+        .testimonial-role {
+            color: #777;
+            font-size: 0.9rem;
+        }
+
+        /* CTA Section */
+        .cta {
+            padding: 5rem 2rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            text-align: center;
+            display: none;
+        }
+
+        .cta h2 {
+            font-family: var(--font-header);
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .cta p {
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark-color);
+            color: white;
+            padding: 3rem 2rem 1rem;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .footer-logo img {
+            height: 40px;
+            width: auto;
+        }
+
+        .footer-logo-text {
+            font-family: var(--font-header);
+            font-size: 1.2rem;
+        }
+
+        .footer-about p {
+            opacity: 0.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-links a {
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background: var(--primary-color);
+            transform: translateY(-3px);
+        }
+
+        .footer-links h3 {
+            font-family: var(--font-header);
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-links h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background: var(--primary-color);
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-color);
+        }
+
+        .footer-contact p {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            margin-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            padding: 2rem;
+            position: relative;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #777;
+            transition: color 0.3s ease;
+        }
+
+        .modal-close:hover {
+            color: var(--primary-color);
+        }
+
+        .modal-title {
+            font-family: var(--font-modal);
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+            text-align: center;
+        }
+
+        .modal-form .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-form label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .modal-form input,
+        .modal-form textarea,
+        .modal-form select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: var(--font-normal);
+            transition: border-color 0.3s ease;
+        }
+
+        .modal-form input:focus,
+        .modal-form textarea:focus,
+        .modal-form select:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .modal-form textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .modal-form .btn {
+            width: 100%;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                padding: 0 1.5rem;
+            }
+
+            nav {
+                position: fixed;
+                top: 80px;
+                left: 0;
+                width: 100%;
+                background: var(--primary-color);
+                padding: 1rem 0;
+                box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+                transform: translateY(-150%);
+                transition: transform 0.3s ease;
+                z-index: 99;
+            }
+
+            nav.active {
+                transform: translateY(0);
+            }
+
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .hero {
+                padding: 6rem 1.5rem 3rem;
+            }
+
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .step {
+                flex-direction: column;
+            }
+
+            .step-number {
+                margin-bottom: 1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+
+            .section-title h2 {
+                font-size: 2rem;
+            }
+
+            .modal-content {
+                padding: 1.5rem;
+            }
+
+            .modal-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Language Toggle -->
+    <div class="language-toggle">
+        <input type="checkbox" id="language-toggle">
+        <label for="language-toggle" class="toggle-wrapper">
+            <span class="km-label">ភាសាខ្មែរ</span>
+            <span class="en-label">English</span>
+        </label>
+    </div>
+
+    <!-- Back to Top Button -->
+    <div class="back-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <a href="#" class="logo">
+                <img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" alt="PDF Converter Logo">
+                <span class="logo-text">PDF Converter</span>
+            </a>
+            <nav id="main-nav">
+                <ul>
+                    <li><a href="#features" class="en">Features</a><a href="#features" class="khmer" style="display: none;">លក្ខណៈពិសេស</a></li>
+                    <li><a href="#how-it-works" class="en">How It Works</a><a href="#how-it-works" class="khmer" style="display: none;">របៀបដំណើរការ</a></li>
+                    <li><a href="#testimonials" class="en">Testimonials</a><a href="#testimonials" class="khmer" style="display: none;">សេចក្តីអំណាច</a></li>
+                    <li><a href="#contact" class="en">Contact</a><a href="#contact" class="khmer" style="display: none;">ទំនាក់ទំនង</a></li>
+                </ul>
+            </nav>
+            <button class="mobile-menu-btn" id="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-pattern"></div>
+        <div class="hero-container">
+            <h1 class="en">Convert Your Files to PDF Easily</h1>
+            <h1 class="khmer" style="display: none;">បំប្លែងឯកសាររបស់អ្នកទៅជា PDF ដោយងាយស្រួល</h1>
+            <p class="en">Transform your documents, images, and presentations into professional PDF files with just a few clicks. Fast, secure, and free to use.</p>
+            <p class="khmer" style="display: none;">បំប្លែងឯកសារ រូបភាព និងការបង្ហាញរបស់អ្នកទៅជាឯកសារ PDF វិជ្ជាជីវៈដោយមានតែចុចតិចៗ។ លឿន មានសុវត្ថិភាព និងឥតគិតថ្លៃក្នុងការប្រើប្រាស់។</p>
+            <div class="hero-buttons">
+                <a href="#converter" class="btn btn-primary en">
+                    <i class="fas fa-file-import"></i> Convert Now
+                </a>
+                <a href="#converter" class="btn btn-primary khmer" style="display: none;">
+                    <i class="fas fa-file-import"></i> បំប្លែងឥឡូវនេះ
+                </a>
+                <a href="#features" class="btn btn-secondary en">
+                    <i class="fas fa-info-circle"></i> Learn More
+                </a>
+                <a href="#features" class="btn btn-secondary khmer" style="display: none;">
+                    <i class="fas fa-info-circle"></i> ស្វែងយល់បន្ថែម
+                </a>
+            </div>
+            <img src="https://images.unsplash.com/photo-1663124178703-d2d6a333e6c2" alt="PDF Converter Interface" class="hero-image">
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="section-title">
+            <h2 class="en">Powerful Features</h2>
+            <h2 class="khmer" style="display: none;">លក្ខណៈពិសេសដ៏មានឥទ្ធិពល</h2>
+            <p class="en">Everything you need to work with PDF files efficiently</p>
+            <p class="khmer" style="display: none;">អ្វីៗដែលអ្នកត្រូវការដើម្បីធ្វើការជាមួយឯកសារ PDF ដោយមានប្រសិទ្ធភាព</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-file-pdf"></i>
+                </div>
+                <h3 class="en">Multiple Formats</h3>
+                <h3 class="khmer" style="display: none;">ទ្រង់ទ្រាយច្រើន</h3>
+                <p class="en">Convert from Word, Excel, PowerPoint, JPG, and more to PDF format.</p>
+                <p class="khmer" style="display: none;">បំប្លែងពី Word, Excel, PowerPoint, JPG និងច្រើនទៀតទៅជាទ្រង់ទ្រាយ PDF។</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h3 class="en">Secure Processing</h3>
+                <h3 class="khmer" style="display: none;">ដំណើរការដោយសុវត្ថិភាព</h3>
+                <p class="en">Your files are processed securely and deleted automatically after conversion.</p>
+                <p class="khmer" style="display: none;">ឯកសាររបស់អ្នកត្រូវបានដំណើរការដោយសុវត្ថិភាព និងលុបដោយស្វ័យប្រវត្តិបន្ទាប់ពីការបំប្លែង។</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-cloud"></i>
+                </div>
+                <h3 class="en">Cloud Integration</h3>
+                <h3 class="khmer" style="display: none;">ការរួមបញ្ចូលពពក</h3>
+                <p class="en">Directly import files from Google Drive, Dropbox, or OneDrive.</p>
+                <p class="khmer" style="display: none;">នាំចូលឯកសារដោយផ្ទាល់ពី Google Drive, Dropbox ឬ OneDrive។</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3 class="en">Mobile Friendly</h3>
+                <h3 class="khmer" style="display: none;">អនុវត្តលើទូរស័ព្ទ</h3>
+                <p class="en">Works perfectly on all devices including smartphones and tablets.</p>
+                <p class="khmer" style="display: none;">ដំណើរការល្អឥតខ្ចោះលើឧបករណ៍ទាំងអស់ រួមទាំងស្មាតហ្វូន និងថេប្លេត។</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <h3 class="en">Fast Conversion</h3>
+                <h3 class="khmer" style="display: none;">បំប្លែងលឿន</h3>
+                <p class="en">Convert files in seconds with our high-speed processing technology.</p>
+                <p class="khmer" style="display: none;">បំប្លែងឯកសារក្នុងរយៈពេលប៉ុន្មានវិនាទីដោយបច្ចេកវិទ្យាដំណើរការល្បឿនខ្ពស់របស់យើង។</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <h3 class="en">High Quality</h3>
+                <h3 class="khmer" style="display: none;">គុណភាពខ្ពស់</h3>
+                <p class="en">Preserve the original formatting and quality of your documents.</p>
+                <p class="khmer" style="display: none;">រក្សាទ្រង់ទ្រាយដើម និងគុណភាពនៃឯកសាររបស់អ្នក។</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="section-title">
+            <h2 class="en">How It Works</h2>
+            <h2 class="khmer" style="display: none;">របៀបដំណើរការ</h2>
+            <p class="en">Convert your files to PDF in just three simple steps</p>
+            <p class="khmer" style="display: none;">បំប្លែងឯកសាររបស់អ្នកទៅជា PDF ក្នុងជំហានសាមញ្ញបីប៉ុណ្ណោះ</p>
+        </div>
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3 class="en">Upload Your File</h3>
+                    <h3 class="khmer" style="display: none;">ផ្ទុកឡើងឯកសាររបស់អ្នក</h3>
+                    <p class="en">Select the file you want to convert from your computer, cloud storage, or drag and drop it into the upload area.</p>
+                    <p class="khmer" style="display: none;">ជ្រើសរើសឯកសារដែលអ្នកចង់បំប្លែងពីកុំព្យូទ័រ ឃ្លាំងពពក ឬអូស និងទម្លាក់វាទៅក្នុងតំបន់ផ្ទុកឡើង។</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3 class="en">Choose Options</h3>
+                    <h3 class="khmer" style="display: none;">ជ្រើសរើសជម្រើស</h3>
+                    <p class="en">Select your preferred PDF settings like quality, page range, and other conversion options.</p>
+                    <p class="khmer" style="display: none;">ជ្រើសរើសការកំណត់ PDF ដែលអ្នកចូលចិត្តដូចជាគុណភាព ជួរទំព័រ និងជម្រើសបំប្លែងផ្សេងទៀត។</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3 class="en">Download Your PDF</h3>
+                    <h3 class="khmer" style="display: none;">ទាញយក PDF របស់អ្នក</h3>
+                    <p class="en">Your converted PDF file is ready! Download it to your device or save it directly to cloud storage.</p>
+                    <p class="khmer" style="display: none;">ឯកសារ PDF ដែលបានបំប្លែងរបស់អ្នករួចរាល់! ទាញយកវាទៅឧបករណ៍របស់អ្នក ឬរក្សាទុកវាដោយផ្ទាល់ទៅកាន់ឃ្លាំងពពក។</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials" id="testimonials">
+        <div class="section-title">
+            <h2 class="en">What Our Users Say</h2>
+            <h2 class="khmer" style="display: none;">អ្វីដែលអ្នកប្រើប្រាស់របស់យើងនិយាយ</h2>
+            <p class="en">Trusted by thousands of users worldwide</p>
+            <p class="khmer" style="display: none;">ទុកចិត្តដោយអ្នកប្រើប្រាស់រាប់ពាន់នាក់នៅទូទាំងពិភពលោក</p>
+        </div>
+        <div class="testimonials-slider">
+            <div class="testimonial-card">
+                <img src="https://randomuser.me/api/portraits/women/32.jpg" alt="User" class="testimonial-avatar">
+                <p class="testimonial-quote en">This is the best PDF converter I've ever used. Fast, reliable, and the quality is always perfect.</p>
+                <p class="testimonial-quote khmer" style="display: none;">នេះគឺជាឧបករណ៍បំប្លែង PDF ដ៏ល្អបំផុតដែលខ្ញុំបានប្រើ។ លឿន អាចទុកចិត្តបាន ហើយគុណភាពតែងតែល្អឥតខ្ចោះ។</p>
+                <h4 class="testimonial-author">Sophia Johnson</h4>
+                <p class="testimonial-role en">Graphic Designer</p>
+                <p class="testimonial-role khmer" style="display: none;">អ្នករចនាក្រាហ្វិក</p>
+            </div>
+            <div class="testimonial-card">
+                <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="User" class="testimonial-avatar">
+                <p class="testimonial-quote en">I use this converter daily for my work. It saves me so much time and the results are always professional.</p>
+                <p class="testimonial-quote khmer" style="display: none;">ខ្ញុំប្រើឧបករណ៍បំប្លែងនេះជារៀងរាល់ថ្ងៃសម្រាប់ការងាររបស់ខ្ញុំ។ វាជួយសន្សំពេលវេលាយ៉ាងច្រើន ហើយលទ្ធផលតែងតែមានលក្ខណៈវិជ្ជាជីវៈ។</p>
+                <h4 class="testimonial-author">Michael Chen</h4>
+                <p class="testimonial-role en">Business Consultant</p>
+                <p class="testimonial-role khmer" style="display: none;">អ្នកប្រឹក្សាអាជីវកម្ម</p>
+            </div>
+            <div class="testimonial-card">
+                <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="User" class="testimonial-avatar">
+                <p class="testimonial-quote en">The cloud integration is a game-changer. I can convert files directly from my Google Drive without downloading them first.</p>
+                <p class="testimonial-quote khmer" style="display: none;">ការរួមបញ្ចូលពពកគឺជាការផ្លាស់ប្តូរល្បែង។ ខ្ញុំអាចបំប្លែងឯកសារដោយផ្ទាល់ពី Google Drive របស់ខ្ញុំដោយមិនចាំបាច់ទាញយកវាជាមុនសិន។</p>
+                <h4 class="testimonial-author">Emma Rodriguez</h4>
+                <p class="testimonial-role en">University Professor</p>
+                <p class="testimonial-role khmer" style="display: none;">អ្នកគ្រូវិទ្យាល័យ</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta" id="converter">
+        <div class="section-title">
+            <h2 class="en">Ready to Convert Your Files?</h2>
+            <h2 class="khmer" style="display: none;">ត្រៀមខ្លួនដើម្បីបំប្លែងឯកសាររបស់អ្នកហើយឬនៅ?</h2>
+            <p class="en">Join millions of satisfied users who trust our PDF converter</p>
+            <p class="khmer" style="display: none;">ចូលរួមជាមួយអ្នកប្រើប្រាស់រាប់លាននាក់ដែលទុកចិត្តលើឧបករណ៍បំប្លែង PDF របស់យើង</p>
+        </div>
+        <div class="hero-buttons">
+            <a href="#" class="btn btn-primary pulse en" id="start-converting-btn">
+                <i class="fas fa-magic"></i> Start Converting Now
+            </a>
+            <a href="#" class="btn btn-primary pulse khmer" style="display: none;" id="start-converting-btn-kh">
+                <i class="fas fa-magic"></i> ចាប់ផ្តើមបំប្លែងឥឡូវនេះ
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="footer-container">
+            <div class="footer-about">
+                <div class="footer-logo">
+                    <img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" alt="PDF Converter Logo">
+                    <span class="footer-logo-text">PDF Converter</span>
+                </div>
+                <p class="en">The most powerful and easy-to-use PDF conversion tool on the web. Convert your files quickly and securely.</p>
+                <p class="khmer" style="display: none;">ឧបករណ៍បំប្លែង PDF ដ៏មានឥទ្ធិពល និងងាយស្រួលប្រើបំផុតនៅលើបណ្តាញ។ បំប្លែងឯកសាររបស់អ្នកយ៉ាងឆាប់រហ័ស និងមានសុវត្ថិភាព។</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            <div class="footer-links">
+                <h3 class="en">Quick Links</h3>
+                <h3 class="khmer" style="display: none;">តំណភ្ជាប់រហ័ស</h3>
+                <ul>
+                    <li><a href="#features" class="en">Features</a><a href="#features" class="khmer" style="display: none;">លក្ខណៈពិសេស</a></li>
+                    <li><a href="#how-it-works" class="en">How It Works</a><a href="#how-it-works" class="khmer" style="display: none;">របៀបដំណើរការ</a></li>
+                    <li><a href="#testimonials" class="en">Testimonials</a><a href="#testimonials" class="khmer" style="display: none;">សេចក្តីអំណាច</a></li>
+                    <li><a href="#" class="en">Privacy Policy</a><a href="#" class="khmer" style="display: none;">គោលការណ៍ឯកជនភាព</a></li>
+                    <li><a href="#" class="en">Terms of Service</a><a href="#" class="khmer" style="display: none;">លក្ខខណ្ឌនៃសេវាកម្ម</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h3 class="en">Support</h3>
+                <h3 class="khmer" style="display: none;">ជំនួយ</h3>
+                <ul>
+                    <li><a href="#" class="en">Help Center</a><a href="#" class="khmer" style="display: none;">មជ្ឈមណ្ឌលជំនួយ</a></li>
+                    <li><a href="#" class="en">FAQ</a><a href="#" class="khmer" style="display: none;">សំណួរដែលសួរញឹកញាប់</a></li>
+                    <li><a href="#" class="en">Contact Us</a><a href="#" class="khmer" style="display: none;">ទាក់ទងមកយើងខ្ញុំ</a></li>
+                    <li><a href="#" class="en">Feedback</a><a href="#" class="khmer" style="display: none;">មតិកែលម្អ</a></li>
+                </ul>
+            </div>
+            <div class="footer-contact">
+                <h3 class="en">Contact Us</h3>
+                <h3 class="khmer" style="display: none;">ទាក់ទងមកយើងខ្ញុំ</h3>
+                <p><i class="fas fa-map-marker-alt"></i> <span class="en">Phnom Penh, Cambodia</span><span class="khmer" style="display: none;">ភ្នំពេញ កម្ពុជា</span></p>
+                <p><i class="fas fa-envelope"></i> info@pdfconverter.com</p>
+                <p><i class="fas fa-phone-alt"></i> +855 23 456 789</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p class="en">2025 - All rights reserved. Provide by Mr. Phekdey PHORN</p>
+            <p class="khmer" style="display: none;">2025 - រក្សារ​សិទ្ធិ​គ្រប់​យ៉ាង ដោយលោក ផន ភក្ដី។</p>
+        </div>
+    </footer>
+
+    <!-- Converter Modal -->
+    <div class="modal" id="converter-modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h2 class="modal-title en">Convert Your File</h2>
+            <h2 class="modal-title khmer" style="display: none;">បំប្លែងឯកសាររបស់អ្នក</h2>
+            <form class="modal-form">
+                <div class="form-group">
+                    <label for="file-upload" class="en">Select File</label>
+                    <label for="file-upload" class="khmer" style="display: none;">ជ្រើសរើសឯកសារ</label>
+                    <input type="file" id="file-upload" class="en" placeholder="Choose a file to convert">
+                    <input type="file" id="file-upload" class="khmer" style="display: none;" placeholder="ជ្រើសរើសឯកសារដើម្បីបំប្លែង">
+                </div>
+                <div class="form-group">
+                    <label for="output-format" class="en">Output Format</label>
+                    <label for="output-format" class="khmer" style="display: none;">ទ្រង់ទ្រាយលទ្ធផល</label>
+                    <select id="output-format">
+                        <option value="pdf" class="en">PDF Document</option>
+                        <option value="pdf" class="khmer" style="display: none;">ឯកសារ PDF</option>
+                        <option value="pdfa" class="en">PDF/A (Archival)</option>
+                        <option value="pdfa" class="khmer" style="display: none;">PDF/A (សារាយ)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="quality" class="en">Quality</label>
+                    <label for="quality" class="khmer" style="display: none;">គុណភាព</label>
+                    <select id="quality">
+                        <option value="high" class="en">High (Recommended)</option>
+                        <option value="high" class="khmer" style="display: none;">ខ្ពស់ (ផ្តល់អនុសាសន៍)</option>
+                        <option value="medium" class="en">Medium</option>
+                        <option value="medium" class="khmer" style="display: none;">មធ្យម</option>
+                        <option value="low" class="en">Low</option>
+                        <option value="low" class="khmer" style="display: none;">ទាប</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary en">
+                    <i class="fas fa-file-export"></i> Convert Now
+                </button>
+                <button type="submit" class="btn btn-primary khmer" style="display: none;">
+                    <i class="fas fa-file-export"></i> បំប្លែងឥឡូវនេះ
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mainNav = document.getElementById('main-nav');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            mainNav.classList.toggle('active');
+            mobileMenuBtn.innerHTML = mainNav.classList.contains('active') ? 
+                '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+        });
+
+        // Language Toggle
+        const languageToggle = document.getElementById('language-toggle');
+        const englishElements = document.querySelectorAll('.en');
+        const khmerElements = document.querySelectorAll('.khmer');
+
+        languageToggle.addEventListener('change', () => {
+            if (languageToggle.checked) {
+                // Switch to English
+                englishElements.forEach(el => el.style.display = 'block');
+                khmerElements.forEach(el => el.style.display = 'none');
+            } else {
+                // Switch to Khmer
+                englishElements.forEach(el => el.style.display = 'none');
+                khmerElements.forEach(el => el.style.display = 'block');
+            }
+        });
+
+        // Back to Top Button
+        const backToTop = document.querySelector('.back-to-top');
+
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTop.classList.add('active');
+            } else {
+                backToTop.classList.remove('active');
+            }
+        });
+
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Modal
+        const converterModal = document.getElementById('converter-modal');
+        const startConvertingBtn = document.getElementById('start-converting-btn');
+        const startConvertingBtnKh = document.getElementById('start-converting-btn-kh');
+        const modalClose = document.querySelector('.modal-close');
+
+        function openModal() {
+            converterModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            converterModal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        startConvertingBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            openModal();
+        });
+
+        startConvertingBtnKh.addEventListener('click', (e) => {
+            e.preventDefault();
+            openModal();
+        });
+
+        modalClose.addEventListener('click', closeModal);
+
+        window.addEventListener('click', (e) => {
+            if (e.target === converterModal) {
+                closeModal();
+            }
+        });
+
+        // Animate elements on scroll
+        const animateOnScroll = () => {
+            const featureCards = document.querySelectorAll('.feature-card');
+            const steps = document.querySelectorAll('.step');
+            const testimonials = document.querySelectorAll('.testimonial-card');
+
+            featureCards.forEach((card, index) => {
+                const cardPosition = card.getBoundingClientRect().top;
+                const screenPosition = window.innerHeight / 1.3;
+
+                if (cardPosition < screenPosition) {
+                    setTimeout(() => {
+                        card.classList.add('animated');
+                    }, index * 150);
+                }
+            });
+
+            steps.forEach((step, index) => {
+                const stepPosition = step.getBoundingClientRect().top;
+                const screenPosition = window.innerHeight / 1.3;
+
+                if (stepPosition < screenPosition) {
+                    setTimeout(() => {
+                        step.classList.add('animated');
+                    }, index * 200);
+                }
+            });
+
+            testimonials.forEach((testimonial, index) => {
+                const testimonialPosition = testimonial.getBoundingClientRect().top;
+                const screenPosition = window.innerHeight / 1.3;
+
+                if (testimonialPosition < screenPosition) {
+                    setTimeout(() => {
+                        testimonial.classList.add('animated');
+                    }, index * 150);
+                }
+            });
+        };
+
+        window.addEventListener('scroll', animateOnScroll);
+        window.addEventListener('load', animateOnScroll);
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+
+                    // Close mobile menu if open
+                    if (mainNav.classList.contains('active')) {
+                        mainNav.classList.remove('active');
+                        mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
